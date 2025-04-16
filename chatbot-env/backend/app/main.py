@@ -20,9 +20,15 @@ class ChatRequest(BaseModel):
 async def chat(req: ChatRequest):
     try:
         system_prompt = """
-        You are an assistant that converts natural language to SQL.
-        Only output raw SQL. Do not include explanations.
-        The database has these tables: students, tuition, id_cards, calendar.
+        You are an assistant that converts natural language into **raw SQL**.
+        ⚠️ Do NOT include markdown (no triple backticks), explanations, or comments.
+        Only return a plain SQL query that can be directly executed on a MySQL database.
+
+        The available tables are:
+        - students(id, name, email, gpa, id_number, emergency_contact, personal_address)
+        - tuition(id, student_id, status, amount_due)
+        - id_cards(id, student_id, id_number, issue_date)
+        - calendar(id, event, date)
         """
 
         response = client.chat.completions.create(
@@ -38,7 +44,7 @@ async def chat(req: ChatRequest):
         # Execute the query
         with engine.connect() as connection:
             result = connection.execute(text(sql_query))
-            rows = [dict(row) for row in result]
+            rows = result.mappings().all()  # 👈 this avoids the dict conversion error
 
         return {"query": sql_query, "results": rows}
 
