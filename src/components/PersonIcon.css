@@ -1,0 +1,38 @@
+.person-icon {
+    width: 50px;
+    height: 50px;
+    position: relative;
+  }
+  
+  .person-icon .head {
+    width: 30px;
+    height: 30px;
+    background-color: #333;
+    border-radius: 50%;
+    margin: auto;
+  }
+  
+  .person-icon .body {
+    width: 40px;
+    height: 20px;
+    background-color: #333;
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+    margin: 2px auto 0;
+  }
+  
+  .person-icon.small {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .person-icon.small .head {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .person-icon.small .body {
+    width: 30px;
+    height: 15px;
+  }
+  

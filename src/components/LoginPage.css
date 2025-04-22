@@ -1,0 +1,39 @@
+.login-container {
+    width: 100%;
+    max-width: 375px;
+    margin: auto;
+    margin-top: 80px;
+    padding: 30px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    text-align: center;
+  }
+  
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .login-form label {
+    font-weight: bold;
+    text-align: left;
+  }
+  
+  .login-form input,
+  .login-form select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  
+  .login-form button {
+    padding: 10px;
+    background-color: #007bff;
+    border: none;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
