@@ -1,0 +1,34 @@
+go to chatbot-env directory
+
+create a new react app for frontend using: 
+  npx create-react-app frontend
+  cd frontend
+
+install axios:
+  npm install axios
+
+Folder structure:
+src/
+│
+├── components/
+│   ├── ChatHeader.js
+│   ├── ChatBody.js
+│   ├── ChatInput.js
+│   └── PersonIcon.js
+│   ├── ChatHeader.css
+│   ├── PersonIcon.css
+│   ├── LoginPage.js
+│   └── LoginPage.css
+│
+├── App.js
+├── App.css
+└── index.js
+
+Dont forget to make changes in chatbot-env/backend/app/main.py
+
+restart backend:
+  uvicorn app.main:app --reload --port 8000
+
+
+to run the app:
+  npm start
