@@ -1,23 +1,27 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "./App.css";
-import ChatHeader from "./components/ChatHeader";
-import ChatBody from "./components/ChatBody";
-import ChatInput from "./components/ChatInput";
-import LoginPage from "./components/LoginPage";
+import ChatHeader from "./components/Chat/ChatHeader";
+import ChatBody from "./components/Chat/ChatBody";
+import ChatInput from "./components/Chat/ChatInput";
+import LoginPage from "./components/Auth/LoginPage";
+import ProfileCard from "./components/Panels/ProfileCard";
+import MenuPanel from "./components/Panels/MenuPanel";
+import HelpPanel from "./components/Panels/HelpPanel";
 
 function App() {
   const [messages, setMessages] = useState([
     { text: "Hi! How can I help you?", sender: "bot" },
   ]);
 
-  // Read from sessionStorage
   const [userId, setUserId] = useState(() => sessionStorage.getItem("user_id") || "");
   const [userRole, setUserRole] = useState(() => sessionStorage.getItem("user_role") || "");
+  const [showProfileCard, setShowProfileCard] = useState(false);
+  const [showMenuPanel, setShowMenuPanel] = useState(false);
+  const [showHelpPanel, setShowHelpPanel] = useState(false);
 
   const isLoggedIn = !!(userId && userRole);
 
-  // Callback for when login succeeds
   const handleLogin = () => {
     setUserId(sessionStorage.getItem("user_id"));
     setUserRole(sessionStorage.getItem("user_role"));
@@ -29,7 +33,7 @@ function App() {
 
     try {
       const res = await axios.post("http://127.0.0.1:8000/chat", {
-        user_id: userId, // ✅ Use actual logged-in ID here
+        user_id: userId,
         message: text,
       });
 
@@ -48,16 +52,57 @@ function App() {
     }
   };
 
+  const handleLogout = () => {
+    sessionStorage.clear();
+    setUserId("");
+    setUserRole("");
+    setShowProfileCard(false);
+    setShowMenuPanel(false);   // ✅ close menu
+    setShowHelpPanel(false);   // ✅ close help
+  };
+  
+
   return (
     <div className="mobile-container">
       {!isLoggedIn ? (
         <LoginPage onLogin={handleLogin} />
       ) : (
-        <div className="chat-window">
-          <ChatHeader />
-          <ChatBody messages={messages} />
-          <ChatInput onSend={handleSend} />
-        </div>
+        <>
+          <div className="chat-window">
+            <ChatHeader
+              onProfileClick={() => setShowProfileCard(true)}
+              onMenuClick={() => setShowMenuPanel(true)}
+            />
+            <ChatBody messages={messages} />
+            <ChatInput onSend={handleSend} />
+          </div>
+
+          {showProfileCard && (
+            <ProfileCard onClose={() => setShowProfileCard(false)} />
+          )}
+
+          {showMenuPanel && (
+            <MenuPanel
+              isOpen={true}
+              onClose={() => setShowMenuPanel(false)}
+              onHelp={() => {
+                setShowMenuPanel(false);
+                setShowHelpPanel(true);
+              }}
+              onLogout={handleLogout}
+            />
+          )}
+
+          {showHelpPanel && (
+            <HelpPanel
+              isOpen={true}
+              onClose={() =>{
+                setShowHelpPanel(false);
+                setShowMenuPanel(true);
+              }}
+            />
+          )}
+        </>
       )}
     </div>
   );
