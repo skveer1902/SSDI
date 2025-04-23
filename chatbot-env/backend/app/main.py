@@ -26,6 +26,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from routers import student  # assuming it's in routers/student.py
+app.include_router(student.router)
+
+
 # Initialize OpenAI client
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -41,7 +45,7 @@ class LoginRequest(BaseModel):
     role: str
     user_id: str
 
-# ✅ Login endpoint
+#  Login endpoint
 @app.post("/login")
 def login(req: LoginRequest):
     role = req.role.lower()
