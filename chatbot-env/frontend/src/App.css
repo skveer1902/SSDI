@@ -15,7 +15,7 @@ body {
 
 /* Mobile container styling */
 .mobile-container {
-  position: relative;       /* ✅ this is key */
+  position: relative; /* ✅ this is key */
   width: 500px;
   max-width: 100%;
   margin: auto;
@@ -24,7 +24,6 @@ body {
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
-
 
 /* Chat window overall layout */
 .chat-window {
@@ -111,7 +110,7 @@ body {
 }
 
 .chat-input button:hover {
-  background-color: #0056b3;          /* Darker blue */
-  transform: scale(1.05);             /* Slight zoom */
+  background-color: #0056b3; /* Darker blue */
+  transform: scale(1.05); /* Slight zoom */
   box-shadow: 0 2px 8px rgba(0,0,0,0.15); /* Soft shadow */
 }
