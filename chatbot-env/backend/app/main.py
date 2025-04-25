@@ -1,6 +1,6 @@
-# backend/app/main.py
-
-from fastapi import FastAPI, HTTPException
+# ✅ backend/app/main.py
+import traceback
+from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from openai import OpenAI
@@ -17,7 +17,7 @@ load_dotenv()
 # Initialize FastAPI app
 app = FastAPI()
 
-# CORS setup for frontend access
+# CORS setup
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
@@ -26,17 +26,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from routers import student  # assuming it's in routers/student.py
+# Routers
+from routers import student, faculty, admin
 app.include_router(student.router)
+app.include_router(faculty.router)
+app.include_router(admin.router)
 
-
-# Initialize OpenAI client
+# OpenAI client
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# In-memory session context
+# Session store
 user_context: Dict[str, Dict[str, str]] = {}
 
-# Request schemas
+# Request Schemas
 class ChatRequest(BaseModel):
     user_id: str
     message: str
@@ -44,17 +46,22 @@ class ChatRequest(BaseModel):
 class LoginRequest(BaseModel):
     role: str
     user_id: str
+    password: str
 
-#  Login endpoint
+class LogoutRequest(BaseModel):
+    user_id: str
+
+#  login endpoint
 @app.post("/login")
 def login(req: LoginRequest):
     role = req.role.lower()
     user_id = req.user_id.strip()
+    password = req.password.strip()
 
     table_map = {
         "student": ("students", "id_number"),
         "faculty": ("faculty", "faculty_id"),
-        "admin": ("admin", "admin_id")
+        "admin": ("university_admins", "admin_id")
     }
 
     if role not in table_map:
@@ -65,32 +72,41 @@ def login(req: LoginRequest):
     try:
         with engine.connect() as conn:
             result = conn.execute(
-                text(f"SELECT * FROM {table_name} WHERE {id_column} = :id"),
-                {"id": user_id}
+                text(f"SELECT * FROM {table_name} WHERE {id_column} = :id AND password = :password"),
+                {"id": user_id, "password": password}
             )
             user = result.first()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
     if not user:
-        return {"status": "error", "message": f"No {role} found with ID {user_id}"}
+        raise HTTPException(status_code=401, detail="Invalid ID or password")
 
-    # Store role + ID in user_context
     user_context[user_id] = {
         "role": role,
         "id": user_id,
         "verified": True
     }
 
-    return {"status": "success", "message": f"{role.title()} {user_id} successfully logged in."}
+    return {
+        "status": "success",
+        "message": f"{role.title()} {user_id} successfully logged in.",
+        "role": role,
+        "user_id": user_id
+    }
 
-# ✅ Chat endpoint (for conversation only)
+# ✅ Logout endpoint
+@app.post("/logout")
+def logout(req: LogoutRequest):
+    user_context.pop(req.user_id, None)
+    return {"status": "success", "message": "User logged out successfully."}
+
+# ✅ Chat endpoint
 @app.post("/chat")
 async def chat(req: ChatRequest):
     sid = req.user_id
     msg = req.message.strip()
 
-    # Check session
     if sid not in user_context or not user_context[sid].get("verified"):
         return {
             "response": "🔒 You must log in first. Please go back to the login page."
@@ -107,12 +123,12 @@ async def chat(req: ChatRequest):
         Use only valid column names based on the schema below.
 
         Tables and columns:
-        - students(id, name, email, gpa, id_number, emergency_contact, personal_address)
+        - students(id, name, email, gpa, id_number, emergency_contact, personal_address, password)
         - tuition(id, student_id, status, amount_due)
         - id_cards(id, student_id, id_number, issue_date)
         - calendar(id, event, date)
-        - faculty(faculty_id, name, ...)
-        - admin(admin_id, name, ...)
+        - faculty(id, faculty_id, name, department, email, phone, designation, office, password)
+        - admin(id, admin_id, name, email, password)
 
         The user is a {role} with ID: {identifier}.
         Use this ID to filter appropriately (e.g., id_number for students).
@@ -133,7 +149,6 @@ async def chat(req: ChatRequest):
         if not re.match(r"^\s*(SELECT|UPDATE|INSERT|DELETE)\s", sql_query, re.IGNORECASE):
             return {"response": f"⚠️ GPT returned a non-SQL message: {sql_query}"}
 
-        # Execute query
         with engine.connect() as conn:
             result = conn.execute(text(sql_query))
             rows = [dict(row) for row in result.mappings()]
@@ -141,14 +156,25 @@ async def chat(req: ChatRequest):
         if not rows:
             return {"response": "No records found."}
 
-        # Post-process known patterns (like GPA)
         row = rows[0]
-        if "gpa" in row:
-            return {"response": f"Your GPA is {row['gpa']}."}
-        elif "emergency_contact" in row:
-            return {"response": f"Your emergency contact number is {row['emergency_contact']}."}
-        else:
-            return {"response": "\n".join(f"{k}: {v}" for k, v in row.items())}
+
+        # Format nicely if it's student personal details
+        if set(["name", "email", "gpa", "id_number", "emergency_contact", "personal_address"]).issubset(row.keys()):
+            return {
+                "response": (
+                    f"Name: {row['name']}\n"
+                    f"Email: {row['email']}\n"
+                    f"GPA: {row['gpa']}\n"
+                    f"ID Number: {row['id_number']}\n"
+                    f"Emergency Contact: {row['emergency_contact']}\n"
+                    f"Address: {row['personal_address']}"
+                )
+            }
+
+        return {
+            "response": "\n".join(f"{k}: {v}" for k, v in row.items())
+        }
 
     except Exception as e:
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
