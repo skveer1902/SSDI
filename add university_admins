@@ -1,0 +1,23 @@
+CREATE TABLE university_admins (
+    admin_id VARCHAR(10) PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    role VARCHAR(100) NOT NULL,
+    password VARCHAR(100) NOT NULL
+);
+
+INSERT INTO university_admins (admin_id, name, role, password) VALUES
+('adm_001', 'Alice Morgan', 'Registrar', 'alice123'),
+('adm_002', 'Brian Edwards', 'Admissions Officer', 'brian123'),
+('adm_003', 'Clara Thompson', 'Academic Affairs', 'clara123'),
+('adm_004', 'Daniel Ross', 'Financial Aid Officer', 'daniel123'),
+('adm_005', 'Evelyn Green', 'Student Services', 'evelyn123'),
+('adm_006', 'Frank Patel', 'IT Administrator', 'frank123'),
+('adm_007', 'Grace Lewis', 'Dean’s Office Assistant', 'grace123'),
+('adm_008', 'Henry Lee', 'Library Coordinator', 'henry123'),
+('adm_009', 'Ivy Chen', 'International Programs Officer', 'ivy123'),
+('adm_010', 'Jack White', 'Housing Supervisor', 'jack123'),
+('adm_011', 'Karen Singh', 'Career Counselor', 'karen123'),
+('adm_012', 'Liam Turner', 'Tuition Billing Manager', 'liam123'),
+('adm_013', 'Maya Jones', 'ID Services Supervisor', 'maya123'),
+('adm_014', 'Nathan Kim', 'Faculty Records Manager', 'nathan123'),
+('adm_015', 'Olivia Brown', 'University Secretary', 'olivia123');

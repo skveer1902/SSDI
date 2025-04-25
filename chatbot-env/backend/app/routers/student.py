@@ -7,8 +7,8 @@ router = APIRouter()
 
 # Personal Info
 @router.get("/get_student_info/{student_id}")
-def get_student_info(student_id: int, db: Session = Depends(get_db)):
-    student = db.query(Student).filter(Student.id == student_id).first()
+def get_student_info(student_id: str, db: Session = Depends(get_db)):
+    student = db.query(Student).filter(Student.id_number == student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
     return student
