@@ -1,40 +1,41 @@
-// src/components/LoginPage.js
+// ✅ LoginPage.js
 import React, { useState } from "react";
 import axios from "axios";
 import "./LoginPage.css";
 
-export default function LoginPage({ onLogin }) {
+function LoginPage({ onLogin }) {
   const [role, setRole] = useState("student");
   const [userId, setUserId] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
-      const response = await axios.post("http://127.0.0.1:8000/login", {
+      const res = await axios.post("http://127.0.0.1:8000/login", {
         role,
         user_id: userId,
+        password,
       });
 
-      if (response.data.status === "success") {
-        sessionStorage.setItem("user_id", userId);
-        sessionStorage.setItem("user_role", role);
-        onLogin(); // triggers transition to chat
-      } else {
-        setError(response.data.message || "Login failed.");
+      if (res.data.status === "success") {
+        sessionStorage.setItem("user_id", res.data.user_id);
+        sessionStorage.setItem("user_role", res.data.role);
+        onLogin();
       }
-    } catch (err) {
-      console.error(err);
-      setError("Server error. Please try again.");
+    } catch (error) {
+      console.error(error);
+      setError("Invalid credentials. Please try again.");
     }
   };
 
   return (
-    <div className="login-container">
-      <h2>Login to Chatbot</h2>
-      <form onSubmit={handleSubmit} className="login-form">
+    <div className="login-wrapper">
+      <form className="login-box" onSubmit={handleLogin}>
+        <h2>Login to Chatbot</h2>
+
         <label>
           Role:
           <select value={role} onChange={(e) => setRole(e.target.value)}>
@@ -54,18 +55,22 @@ export default function LoginPage({ onLogin }) {
           />
         </label>
 
-        {/* <label>
+        <label>
           Password:
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
-        </label> */}
+        </label>
 
         <button type="submit">Login</button>
-        {error && <p className="error">{error}</p>}
+
+        {error && <div className="error-message">{error}</div>}
       </form>
     </div>
   );
 }
+
+export default LoginPage;
