@@ -125,15 +125,15 @@ async def chat(req: ChatRequest):
         Tables and columns:
         - students(id, name, email, gpa, id_number, emergency_contact, personal_address, password)
         - tuition(id, student_id, status, amount_due)
-        - id_cards(id, student_id, id_number, issue_date)
+        - id_card(id, student_id, name, issue_date, id_number)
         - calendar(id, event, date)
-        - faculty(id, faculty_id, name, department, email, phone, designation, office, password)
-        - admin(id, admin_id, name, email, password)
+        - faculty(faculty_id, name, department, email, phone, designation, office, password)
+        - university_admins(admin_id, name, role, password)
 
         The user is a {role} with ID: {identifier}.
-        Use this ID to filter appropriately (e.g., id_number for students).
+        Use this ID to filter appropriately (e.g., id_number for students, faculty_id for faculty).
         """
-
+        
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
@@ -178,3 +178,4 @@ async def chat(req: ChatRequest):
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+    
