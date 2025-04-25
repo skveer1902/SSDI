@@ -1,64 +1,102 @@
 .profile-slide-card {
-    position: absolute;         /* ✅ Keeps it inside the container */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 20;
-    animation: slideIn 0.3s ease forwards;
-  }
-  
-  .profile-content {
-    background: white;
-    width: 75%;
-    height: 100%;
-    padding: 20px;
-    box-shadow: 4px 0 10px rgba(0,0,0,0.15);
-    overflow-y: auto;
-    position: relative;
-  }  
-  .profile-backdrop {
-    width: 25%;                /* Remaining 25% of layout */
-    height: 100%;
-    background: rgba(0, 0, 0, 0.05); /* Light dim effect */
-    cursor: pointer;
-  }
-  
-  .profile-icon-center {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 10px;
-  }
-  
-  .profile-heading {
-    text-align: center;
-    font-size: 1.2rem;
-    margin-bottom: 15px;
-    color: #333;
-  }
-  
-  .profile-details p {
-    margin: 6px 0;
-    font-size: 0.95rem;
-    color: #444;
-  }
-  
-  @keyframes slideIn {
-    from {
-      transform: translateX(-100%);
-    }
-    to {
-      transform: translateX(0);
-    }
-  }
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex; /* Flex to split card and backdrop */
+  z-index: 20;
+  animation: slideIn 0.3s ease forwards;
+}
 
-  .close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: transparent;
-    font-size: 20px;
-    border: none;
-    cursor: pointer;
+.profile-content {
+  background: white;
+  width: 75%;            /* 75% for profile card */
+  height: 100%;
+  padding: 20px;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.15);
+  overflow-y: auto;
+  position: relative;
+}
+
+.profile-backdrop {
+  width: 25%;            /* 25% for light dim background */
+  height: 100%;
+  background: rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+}
+
+/* Icon at center */
+.profile-icon-center {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+/* Profile Heading */
+.profile-heading {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+/* Personal Info Details */
+.profile-details p {
+  margin: 6px 0;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+/* Error Message */
+.error-message {
+  color: red;
+  text-align: center;
+  font-size: 1rem;
+  margin-top: 20px;
+}
+
+/* Slide Animation */
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
   }
-  
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Close button */
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  font-size: 20px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Person Icon Shape */
+.person-icon {
+  width: 50px;
+  height: 50px;
+  position: relative;
+}
+
+.person-icon .head {
+  width: 30px;
+  height: 30px;
+  background-color: #333;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+.person-icon .body {
+  width: 40px;
+  height: 20px;
+  background-color: #333;
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+  margin: 2px auto 0;
+}
