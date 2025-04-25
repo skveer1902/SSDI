@@ -1,3 +1,4 @@
+// ✅ App.js
 import React, { useState } from "react";
 import axios from "axios";
 import "./App.css";
@@ -13,7 +14,7 @@ function App() {
   const [messages, setMessages] = useState([
     { text: "Hi! How can I help you?", sender: "bot" },
   ]);
-
+  
   const [userId, setUserId] = useState(() => sessionStorage.getItem("user_id") || "");
   const [userRole, setUserRole] = useState(() => sessionStorage.getItem("user_role") || "");
   const [showProfileCard, setShowProfileCard] = useState(false);
@@ -25,6 +26,7 @@ function App() {
   const handleLogin = () => {
     setUserId(sessionStorage.getItem("user_id"));
     setUserRole(sessionStorage.getItem("user_role"));
+    setMessages([{ text: "Hi! How can I help you?", sender: "bot" }]);
   };
 
   const handleSend = async (text) => {
@@ -52,15 +54,22 @@ function App() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      if (userId) {
+        await axios.post("http://127.0.0.1:8000/logout", { user_id: userId });
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
     sessionStorage.clear();
     setUserId("");
     setUserRole("");
+    setMessages([{ text: "Hi! How can I help you?", sender: "bot" }]);
     setShowProfileCard(false);
-    setShowMenuPanel(false);   // ✅ close menu
-    setShowHelpPanel(false);   // ✅ close help
+    setShowMenuPanel(false);
+    setShowHelpPanel(false);
   };
-  
 
   return (
     <div className="mobile-container">
@@ -96,7 +105,7 @@ function App() {
           {showHelpPanel && (
             <HelpPanel
               isOpen={true}
-              onClose={() =>{
+              onClose={() => {
                 setShowHelpPanel(false);
                 setShowMenuPanel(true);
               }}
