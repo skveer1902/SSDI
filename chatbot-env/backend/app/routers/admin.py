@@ -1,42 +1,42 @@
-# ✅ backend/app/routers/admin.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
-from models import Admin, Student, Tuition, IDCard
+from models import Admin, Student, Tuition, IDCard, AcademicCalendar
 
 router = APIRouter()
 
-# Admin can view tuition details
+# 1. Admin view a student's tuition details
 @router.get("/admin/get_tuition_details/{student_id}")
 def get_tuition_details(student_id: str, db: Session = Depends(get_db)):
     student = db.query(Student).filter(Student.id_number == student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
     
-    tuition = db.query(Tuition).filter(Tuition.student_id == student.id).first()
+    tuition = db.query(Tuition).filter(Tuition.student_id == student.id_number).first()
     if not tuition:
         raise HTTPException(status_code=404, detail="Tuition details not found")
     
     return {
         "student_name": student.name,
+        "id_number": student.id_number,
         "tuition_status": tuition.status,
-        "amount_due": tuition.amount_due
+        "amount_due": str(tuition.amount_due)
     }
 
-# Admin can view ID card info
+# 2. Admin view a student's ID card info
 @router.get("/admin/get_id_card/{student_id}")
 def get_id_card(student_id: str, db: Session = Depends(get_db)):
-    card = db.query(IDCard).filter(IDCard.id_number == student_id).first()
-    if not card:
+    id_card = db.query(IDCard).filter(IDCard.student_id == student_id).first()
+    if not id_card:
         raise HTTPException(status_code=404, detail="ID card not found")
     
     return {
-        "id_number": card.id_number,
-        "name": card.name,
-        "issue_date": card.issue_date
+        "student_id": id_card.student_id,
+        "name": id_card.name,
+        "issue_date": id_card.issue_date
     }
 
-# ✅ Admin can view basic student information
+# 3. Admin view basic student information
 @router.get("/admin/get_student_info/{student_id}")
 def get_student_info(student_id: str, db: Session = Depends(get_db)):
     student = db.query(Student).filter(Student.id_number == student_id).first()
@@ -52,7 +52,7 @@ def get_student_info(student_id: str, db: Session = Depends(get_db)):
         "personal_address": student.personal_address
     }
 
-# Admin's own profile
+# 4. Admin's own profile
 @router.get("/admin/get_info/{admin_id}")
 def get_admin_info(admin_id: str, db: Session = Depends(get_db)):
     admin = db.query(Admin).filter(Admin.admin_id == admin_id).first()
@@ -61,5 +61,12 @@ def get_admin_info(admin_id: str, db: Session = Depends(get_db)):
     
     return {
         "name": admin.name,
-        "role": admin.role
+        "role": admin.role,
+        "admin_id": admin.admin_id
     }
+
+# 5. Admin view all calendar events (bonus)
+@router.get("/admin/get_calendar_events")
+def get_calendar(db: Session = Depends(get_db)):
+    events = db.query(AcademicCalendar).all()
+    return [{"event": e.event, "date": e.date} for e in events]
