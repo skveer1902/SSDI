@@ -1,5 +1,3 @@
-# ✅ backend/app/routers/nl_to_sql.py
-
 import os
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -18,15 +16,17 @@ def get_sql_from_prompt(prompt: str) -> str:
     system_prompt = (
         "You are an expert assistant that ONLY outputs valid MySQL queries based on user natural language queries.\n"
         "Database Tables:\n"
-        "- students(id, name, email, gpa, id_number, emergency_contact, personal_address, password)\n"
-        "- tuition(id, student_id, status, amount_due)\n"
-        "- id_card(id, student_id, name, issue_date, id_number)\n"
-        "- calendar(id, event, date)\n\n"
+        "- students(id_number, name, email, gpa, emergency_contact, personal_address, password)\n"
+        "- tuition(student_id, status, amount_due)\n"
+        "- id_card(student_id, name, issue_date)\n"
+        "- calendar(id, event, date)\n"
+        "- faculty(faculty_id, name, department, email, phone, designation, office, password)\n"
+        "- university_admins(admin_id, name, role, password)\n\n"
         "⚡ Important Notes:\n"
-        "- tuition.student_id matches students.id_number (NOT students.id)\n"
-        "- JOIN using tuition.student_id = students.id_number\n"
-        "- id_card.student_id matches students.id_number as well\n"
-        "- Only output pure SQL — no explanations, no markdown, no extra text.\n"
+        "- tuition.student_id matches students.id_number\n"
+        "- id_card.student_id matches students.id_number\n"
+        "- Only output pure SQL without any explanation, markdown, or extra text.\n"
+        "- When joining tables, match tuition.student_id = students.id_number or id_card.student_id = students.id_number appropriately.\n"
     )
 
     try:
@@ -42,7 +42,6 @@ def get_sql_from_prompt(prompt: str) -> str:
 
         sql = response.choices[0].message.content.strip()
 
-        # Remove Markdown format if present
         if "```" in sql:
             sql = sql.replace("```sql", "").replace("```", "").strip()
 
