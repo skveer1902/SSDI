@@ -135,7 +135,7 @@ async def chat(req: ChatRequest):
 
         Endpoints:
         - /faculty/get_student_info/{{student_id}}
-        - /faculty/get_attendance/{{student_id}}
+        - /faculty/get_student_attendance/{{student_id}}
         - /faculty/get_academic_record/{{student_id}}
         - /faculty/get_info/{identifier}
         - /faculty/get_calendar
@@ -150,6 +150,7 @@ async def chat(req: ChatRequest):
         - /admin/get_student_info/{{student_id}}
         - /admin/get_tuition_details/{{student_id}}
         - /admin/get_id_card/{{student_id}}
+        - /admin/get_student_attendance/{{student_id}}
         - /admin/get_info/{identifier}
         - /admin/get_calendar_events
         """
