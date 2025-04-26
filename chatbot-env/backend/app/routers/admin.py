@@ -5,7 +5,6 @@ from models import Admin, Student, Tuition, IDCard, AcademicCalendar
 
 router = APIRouter()
 
-# 1. Admin view a student's tuition details
 @router.get("/admin/get_tuition_details/{student_id}")
 def get_tuition_details(student_id: str, db: Session = Depends(get_db)):
     student = db.query(Student).filter(Student.id_number == student_id).first()
@@ -16,57 +15,65 @@ def get_tuition_details(student_id: str, db: Session = Depends(get_db)):
     if not tuition:
         raise HTTPException(status_code=404, detail="Tuition details not found")
     
-    return {
-        "student_name": student.name,
-        "id_number": student.id_number,
-        "tuition_status": tuition.status,
-        "amount_due": str(tuition.amount_due)
-    }
+    response = f"""
+    Student Name    : {student.name}
+    ID Number       : {student.id_number}
+    Tuition Status  : {tuition.status}
+    Amount Due      : ₹{tuition.amount_due}
+    """
+    return response.strip()
 
-# 2. Admin view a student's ID card info
 @router.get("/admin/get_id_card/{student_id}")
 def get_id_card(student_id: str, db: Session = Depends(get_db)):
     id_card = db.query(IDCard).filter(IDCard.student_id == student_id).first()
     if not id_card:
         raise HTTPException(status_code=404, detail="ID card not found")
     
-    return {
-        "student_id": id_card.student_id,
-        "name": id_card.name,
-        "issue_date": id_card.issue_date
-    }
+    response = f"""
+    Student ID  : {id_card.student_id}
+    Name        : {id_card.name}
+    Issue Date  : {id_card.issue_date}
+    """
+    return response.strip()
 
-# 3. Admin view basic student information
 @router.get("/admin/get_student_info/{student_id}")
 def get_student_info(student_id: str, db: Session = Depends(get_db)):
     student = db.query(Student).filter(Student.id_number == student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
     
-    return {
-        "name": student.name,
-        "email": student.email,
-        "gpa": student.gpa,
-        "id_number": student.id_number,
-        "emergency_contact": student.emergency_contact,
-        "personal_address": student.personal_address
-    }
+    response = f"""
+    Name              : {student.name}
+    Email             : {student.email}
+    GPA               : {student.gpa}
+    ID Number         : {student.id_number}
+    Emergency Contact : {student.emergency_contact}
+    Address           : {student.personal_address}
+    """
+    return response.strip()
 
-# 4. Admin's own profile
 @router.get("/admin/get_info/{admin_id}")
 def get_admin_info(admin_id: str, db: Session = Depends(get_db)):
     admin = db.query(Admin).filter(Admin.admin_id == admin_id).first()
     if not admin:
         raise HTTPException(status_code=404, detail="Admin not found")
     
-    return {
-        "name": admin.name,
-        "role": admin.role,
-        "admin_id": admin.admin_id
-    }
+    response = f"""
+    Name      : {admin.name}
+    Role      : {admin.role}
+    Admin ID  : {admin.admin_id}
+    """
+    return response.strip()
 
-# 5. Admin view all calendar events (bonus)
 @router.get("/admin/get_calendar_events")
 def get_calendar(db: Session = Depends(get_db)):
     events = db.query(AcademicCalendar).all()
-    return [{"event": e.event, "date": e.date} for e in events]
+    
+    if not events:
+        return "No calendar events found."
+
+    formatted_events = "\n\n".join(
+        f"Event : {e.event}\nDate  : {e.date}"
+        for e in events
+    )
+    return formatted_events.strip()
