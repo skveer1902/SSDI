@@ -52,6 +52,20 @@ def get_student_info(student_id: str, db: Session = Depends(get_db)):
     """
     return response.strip()
 
+@router.get("/admin/get_student_attendance/{student_id}")
+def get_student_attendance(student_id: str, db: Session = Depends(get_db)):
+    student = db.query(Student).filter(Student.id_number == student_id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    attendance_value = f"{student.attendance}%" if student.attendance is not None else "N/A"
+
+    response = f"""
+    Student ID            : {student.id_number}
+    Attendance Percentage : {attendance_value}
+    """
+    return response.strip()
+
 @router.get("/admin/get_info/{admin_id}")
 def get_admin_info(admin_id: str, db: Session = Depends(get_db)):
     admin = db.query(Admin).filter(Admin.admin_id == admin_id).first()
@@ -73,7 +87,6 @@ def get_calendar(db: Session = Depends(get_db)):
         return "No calendar events found."
 
     formatted_events = "\n\n".join(
-        f"Event : {e.event}\nDate  : {e.date}"
-        for e in events
+        f"Event : {e.event}\nDate  : {e.date}" for e in events
     )
     return formatted_events.strip()
