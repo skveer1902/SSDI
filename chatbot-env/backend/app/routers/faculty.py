@@ -27,28 +27,23 @@ def get_student_info(student_id: str, db: Session = Depends(get_db)):
     return response.strip()
 
 @router.get("/faculty/get_student_attendance/{student_id}")
-def get_attendance(student_id: str, db: Session = Depends(get_db)):
-    holidays = db.query(AcademicCalendar).all()
+def get_student_attendance(student_id: str, db: Session = Depends(get_db)):
+    student = db.query(Student).filter(Student.id_number == student_id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
 
-    if not holidays:
-        holidays_text = "No upcoming holidays."
-    else:
-        holidays_text = "\n\n".join(
-            f"Event : {h.event}\nDate  : {h.date}" for h in holidays
-        )
+    # Handle if attendance is NULL
+    attendance_value = f"{student.attendance}%" if student.attendance is not None else "N/A"
 
     response = f"""
-    Student ID            : {student_id}
-    Attendance Percentage : 90%
-
-    --- Upcoming Holidays ---
-    {holidays_text}
+    Student ID            : {student.id_number}
+    Attendance Percentage : {attendance_value}
     """
 
     return response.strip()
 
 @router.get("/faculty/get_student_academic_records/{student_id}")
-def get_academic_record(student_id: str, db: Session = Depends(get_db)):
+def get_student_academic_records(student_id: str, db: Session = Depends(get_db)):
     student = db.query(Student).filter(Student.id_number == student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
