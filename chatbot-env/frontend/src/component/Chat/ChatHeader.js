@@ -1,4 +1,3 @@
-// ✅ ChatHeader.js
 import React from "react";
 import PersonIcon from "../Icons/PersonIcon";
 import "./ChatHeader.css";
