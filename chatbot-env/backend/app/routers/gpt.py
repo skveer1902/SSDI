@@ -4,22 +4,22 @@ import os
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from dotenv import load_dotenv
-import openai
+from openai import OpenAI
 
 # Load environment variables
 load_dotenv()
 
-# Set OpenAI API key
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
-# Raise error if key is not found
-if not openai.api_key:
+# Initialize OpenAI client
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
     raise Exception("Please set the OPENAI_API_KEY environment variable")
+
+client = OpenAI(api_key=api_key)
 
 # Initialize router
 router = APIRouter()
 
-# Request body model
+# Request model
 class Message(BaseModel):
     text: str
 
@@ -27,14 +27,14 @@ class Message(BaseModel):
 @router.post("/chat")
 async def chat_with_gpt(message: Message):
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4o",  # You can change this to "gpt-3.5-turbo" if needed
+        response = client.chat.completions.create(
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": message.text}
             ],
-            max_tokens=150,
-            temperature=0.7
+            temperature=0.7,
+            max_tokens=200
         )
         reply = response.choices[0].message.content.strip()
         return {"response": reply}
