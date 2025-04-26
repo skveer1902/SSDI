@@ -15,6 +15,5 @@ backend = subprocess.Popen(backend_command, cwd=backend_path)
 # Launch frontend
 frontend = subprocess.Popen(frontend_command, cwd=frontend_path)
 
-# (Optional) Wait for both to end
 backend.wait()
 frontend.wait()
