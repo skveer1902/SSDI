@@ -17,6 +17,7 @@ def get_student_info(student_id: str, db: Session = Depends(get_db)):
     GPA               : {student.gpa}
     Emergency Contact : {student.emergency_contact}
     Address           : {student.personal_address}
+    Attendance        : {student.attendance}%
     """
     return response.strip()
 
