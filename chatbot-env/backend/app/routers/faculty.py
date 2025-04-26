@@ -5,7 +5,6 @@ from models import Faculty, Student, IDCard, AcademicCalendar
 
 router = APIRouter()
 
-# 1. Faculty view student personal + ID card info
 @router.get("/faculty/get_student_info/{student_id}")
 def get_student_info(student_id: str, db: Session = Depends(get_db)):
     student = db.query(Student).filter(Student.id_number == student_id).first()
@@ -25,7 +24,6 @@ def get_student_info(student_id: str, db: Session = Depends(get_db)):
         }
     }
 
-# 2. Faculty view student attendance (mocked attendance + academic calendar holidays)
 @router.get("/faculty/get_student_attendance/{student_id}")
 def get_attendance(student_id: str, db: Session = Depends(get_db)):
     holidays = db.query(AcademicCalendar).all()
@@ -33,11 +31,10 @@ def get_attendance(student_id: str, db: Session = Depends(get_db)):
 
     return {
         "student_id": student_id,
-        "attendance_percentage": "90%",  # mocked
+        "attendance_percentage": "90%", 
         "upcoming_holidays": upcoming_holidays
     }
 
-# 3. Faculty view student academic record
 @router.get("/faculty/get_student_academic_records/{student_id}")
 def get_academic_record(student_id: str, db: Session = Depends(get_db)):
     student = db.query(Student).filter(Student.id_number == student_id).first()
@@ -48,16 +45,15 @@ def get_academic_record(student_id: str, db: Session = Depends(get_db)):
         "student_id": student.id_number,
         "gpa": student.gpa,
         "grades": {
-            "Artificial Intelligence": "A",  # still mocked
+            "Artificial Intelligence": "A", 
             "Software Engineering": "B+",
             "Database Systems": "A-"
         }
     }
 
-# 4. Faculty view their own info
 @router.get("/faculty/get_info/{faculty_id}")
 def get_faculty_info(faculty_id: str, db: Session = Depends(get_db)):
-    # Validation: Prevent sending {faculty_id} literally
+
     if faculty_id.startswith("{") and faculty_id.endswith("}"):
         raise HTTPException(status_code=400, detail="Invalid faculty ID provided.")
 
@@ -75,7 +71,6 @@ def get_faculty_info(faculty_id: str, db: Session = Depends(get_db)):
         "office": faculty.office
     }
 
-# 5. Faculty view academic calendar
 @router.get("/faculty/get_calendar")
 def get_calendar(db: Session = Depends(get_db)):
     events = db.query(AcademicCalendar).all()
