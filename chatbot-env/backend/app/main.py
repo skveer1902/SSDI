@@ -52,7 +52,6 @@ class ChatRequest(BaseModel):
     user_id: str
     message: str
 
-# ✅ Login Endpoint
 @app.post("/login")
 def login(req: LoginRequest):
     role = req.role.lower()
@@ -99,12 +98,10 @@ def login(req: LoginRequest):
         "user_id": user_id
     }
 
-# ✅ Logout Endpoint
 @app.post("/logout")
 async def logout():
     return JSONResponse(content={"message": "Successfully logged out."})
 
-# ✅ Chat Endpoint (updated)
 @app.post("/chat")
 async def chat(req: ChatRequest):
     sid = req.user_id
@@ -117,7 +114,6 @@ async def chat(req: ChatRequest):
     role = context["role"]
     identifier = context["id"]
 
-    # 📢 Role-specific dynamic system prompt
     if role == "student":
         system_prompt = f"""
         You assist a student.
@@ -162,7 +158,6 @@ async def chat(req: ChatRequest):
         system_prompt = "Invalid role."
 
     try:
-        # 🔥 OpenAI call
         response = openai_client.chat.completions.create(
             model="gpt-4o",
             messages=[
@@ -178,7 +173,6 @@ async def chat(req: ChatRequest):
 
         api_path = raw_reply.replace("CALL API:", "").strip()
 
-        # ✅ Make internal API call
         async with httpx.AsyncClient(base_url="http://localhost:8000") as async_client:
             api_response = await async_client.get(api_path)
 
@@ -187,7 +181,6 @@ async def chat(req: ChatRequest):
 
         data = api_response.json()
 
-        # ✅ Pretty format
         if isinstance(data, dict):
             formatted = "\n".join(f"{k.replace('_', ' ').title()}: {v}" for k, v in data.items())
         else:
