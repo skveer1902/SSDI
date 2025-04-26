@@ -1,96 +1,95 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import "./ProfileCard.css";
-
-function ProfileCard({ onClose }) {
-  const [profile, setProfile] = useState(null);
-  const [error, setError] = useState("");
-
-  const userId = sessionStorage.getItem("user_id");
-  const userRole = sessionStorage.getItem("user_role");
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        let endpoint = "";
-
-        if (userRole === "student") {
-          endpoint = `/get_student_info/${userId}`;
-        } else if (userRole === "faculty") {
-          endpoint = `/faculty/get_info/${userId}`;
-        } else if (userRole === "admin") {
-          endpoint = `/admin/get_info/${userId}`;
-        } else {
-          throw new Error("Invalid role");
-        }
-
-        const res = await axios.get(`http://127.0.0.1:8000${endpoint}`);
-
-        console.log("Profile data:", res.data);
-
-        const cleanData = res.data.response || res.data;
-        
-        if (typeof cleanData === "string") {
-          const lines = cleanData.split("\n").filter(Boolean);
-          const obj = {};
-          lines.forEach(line => {
-            const [key, ...value] = line.split(":");
-            obj[key.trim().toLowerCase().replace(/\s+/g, "_")] = value.join(":").trim();
-          });
-          setProfile(obj);
-        } else {
-          setProfile(cleanData);
-        }
-      } catch (error) {
-        console.error("Failed to fetch profile info:", error);
-        setError("Failed to load profile information.");
-      }
-    };
-
-    fetchProfile();
-  }, [userRole, userId]);
-
-  const displayFields = userRole === "student"
-    ? ["name", "email", "emergency_contact", "personal_address"]
-    : userRole === "admin"
-    ? ["name", "role", "admin_id"]
-    : ["name", "email", "department", "designation", "office"];
-
-  return (
-    <div className="profile-slide-card">
-      <div className="profile-content">
-        <button className="close-button" onClick={onClose}>✖</button>
-
-        <div className="profile-icon-center">
-          <div className="person-icon">
-            <div className="head" />
-            <div className="body" />
-          </div>
-        </div>
-
-        <h3 className="profile-heading">Personal Info</h3>
-
-        <div className="profile-details">
-          {error ? (
-            <p className="error-message">{error}</p>
-          ) : profile ? (
-            displayFields.map((field) => (
-              profile[field] && (
-                <p key={field}>
-                  <strong>{field.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}:</strong> {profile[field]}
-                </p>
-              )
-            ))
-          ) : (
-            <p>Loading...</p>
-          )}
-        </div>
-      </div>
-
-      {/* Backdrop Area */}
-      <div className="profile-backdrop" onClick={onClose} />
-    </div>
-  );
+.profile-slide-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  z-index: 20;
+  animation: slideIn 0.3s ease forwards;
 }
 
-export default ProfileCard;
+.profile-content {
+  background: white;
+  width: 75%;  
+  height: 100%;
+  padding: 20px;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.15);
+  overflow-y: auto;
+  position: relative;
+}
+
+.profile-backdrop {
+  width: 25%;         
+  height: 100%;
+  background: rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+}
+
+.profile-icon-center {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.profile-heading {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.profile-details p {
+  margin: 6px 0;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  font-size: 1rem;
+  margin-top: 20px;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  font-size: 20px;
+  border: none;
+  cursor: pointer;
+}
+
+.person-icon {
+  width: 50px;
+  height: 50px;
+  position: relative;
+}
+
+.person-icon .head {
+  width: 30px;
+  height: 30px;
+  background-color: #333;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+.person-icon .body {
+  width: 40px;
+  height: 20px;
+  background-color: #333;
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+  margin: 2px auto 0;
+}
