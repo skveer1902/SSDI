@@ -1,13 +1,11 @@
-# ✅ backend/app/models.py
 from sqlalchemy import Column, Integer, String, Float, DECIMAL
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
-# ✅ Students Table
 class Student(Base):
     __tablename__ = "students"
-    id_number = Column(String(50), primary_key=True)  # id_number is PK (example: ID0001)
+    id_number = Column(String(50), primary_key=True)
     name = Column(String(100), nullable=False)
     email = Column(String(100), unique=True, nullable=False)
     gpa = Column(Float, nullable=True)
@@ -15,31 +13,27 @@ class Student(Base):
     personal_address = Column(String(200), nullable=True)
     password = Column(String(100), nullable=False)
 
-# ✅ Tuition Table
 class Tuition(Base):
     __tablename__ = "tuition"
-    student_id = Column(String(50), primary_key=True)  # Directly student_id (example: ID0001), PRIMARY KEY
+    student_id = Column(String(50), primary_key=True)  
     status = Column(String(50), nullable=False)
     amount_due = Column(DECIMAL(10, 2), nullable=False)
 
-# ✅ ID Card Table
 class IDCard(Base):
     __tablename__ = "id_card"
-    student_id = Column(String(50), primary_key=True)  # ✅ Correct primary key is student_id
+    student_id = Column(String(50), primary_key=True)
     name = Column(String(100), nullable=False)
     issue_date = Column(String(50), nullable=False)
 
-# ✅ Academic Calendar Table
 class AcademicCalendar(Base):
     __tablename__ = "calendar"
-    id = Column(Integer, primary_key=True, autoincrement=True)  # Calendar is simple ID auto increment
+    id = Column(Integer, primary_key=True, autoincrement=True)  
     event = Column(String(150), nullable=False)
     date = Column(String(50), nullable=False)
 
-# ✅ Faculty Table
 class Faculty(Base):
     __tablename__ = "faculty"
-    faculty_id = Column(String(50), primary_key=True)  # faculty_id is PK (example: FAC001)
+    faculty_id = Column(String(50), primary_key=True)
     name = Column(String(100), nullable=False)
     department = Column(String(100), nullable=False)
     email = Column(String(100), unique=True, nullable=False)
@@ -48,10 +42,9 @@ class Faculty(Base):
     office = Column(String(100), nullable=False)
     password = Column(String(100), nullable=False)
 
-# ✅ Admin Table
 class Admin(Base):
     __tablename__ = "university_admins"
-    admin_id = Column(String(50), primary_key=True)  # admin_id is PK (example: ADM001)
+    admin_id = Column(String(50), primary_key=True)
     name = Column(String(100), nullable=False)
     role = Column(String(100), nullable=False)
     password = Column(String(100), nullable=False)
