@@ -69,7 +69,6 @@ function ProfileCard({ onClose }) {
         </div>
       </div>
 
-      {/* Backdrop Area */}
       <div className="profile-backdrop" onClick={onClose} />
     </div>
   );
