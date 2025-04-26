@@ -1,3 +1,4 @@
+# ✅ backend/app/routers/student.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
@@ -5,31 +6,46 @@ from models import Student, Tuition, IDCard, AcademicCalendar
 
 router = APIRouter()
 
-# Personal Info
 @router.get("/get_student_info/{student_id}")
 def get_student_info(student_id: str, db: Session = Depends(get_db)):
     student = db.query(Student).filter(Student.id_number == student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
-    return student
+    return {
+        "name": student.name,
+        "email": student.email,
+        "gpa": student.gpa,
+        "emergency_contact": student.emergency_contact,
+        "personal_address": student.personal_address
+    }
 
-# Tuition Info
 @router.get("/get_tuition_details/{student_id}")
-def get_tuition_details(student_id: int, db: Session = Depends(get_db)):
+def get_tuition_details(student_id: str, db: Session = Depends(get_db)):
     tuition = db.query(Tuition).filter(Tuition.student_id == student_id).first()
     if not tuition:
         raise HTTPException(status_code=404, detail="Tuition details not found")
-    return tuition
+    return {
+        "student_id": tuition.student_id,
+        "status": tuition.status,
+        "amount_due": float(tuition.amount_due)
+    }
 
-# ID Card
 @router.get("/get_id_card/{student_id}")
-def get_id_card(student_id: int, db: Session = Depends(get_db)):
-    card = db.query(IDCard).filter(IDCard.student_id == student_id).first()
-    if not card:
+def get_id_card(student_id: str, db: Session = Depends(get_db)):
+    id_card = db.query(IDCard).filter(IDCard.student_id == student_id).first()
+    if not id_card:
         raise HTTPException(status_code=404, detail="ID card not found")
-    return card
+    return {
+        "student_id": id_card.student_id,
+        "name": id_card.name,
+        "issue_date": id_card.issue_date
+    }
 
-# Job Postings (Mocked for now)
+@router.get("/get_academic_calendar")
+def get_academic_calendar(db: Session = Depends(get_db)):
+    events = db.query(AcademicCalendar).all()
+    return [{"event": event.event, "date": event.date} for event in events]
+
 @router.get("/get_job_postings")
 def get_job_postings():
     return {
@@ -39,13 +55,6 @@ def get_job_postings():
         ]
     }
 
-# Academic Calendar
-@router.get("/get_academic_calendar")
-def get_academic_calendar(db: Session = Depends(get_db)):
-    events = db.query(AcademicCalendar).all()
-    return {"calendar": events}
-
-# Emergency Contacts (Static for now)
 @router.get("/get_emergency_contacts")
 def get_emergency_contacts():
     return {
