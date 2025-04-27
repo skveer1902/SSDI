@@ -46,7 +46,8 @@ chatbot-env/
 │           └── admin.py
 └── frontend/
     └── src/
-        ├── App.js / App.css
+        ├── App.js
+        ├── App.css
         └── components/
             ├── Auth/
             ├── Chat/
